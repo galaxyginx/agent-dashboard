@@ -1,7 +1,7 @@
 // app/api/rag/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { searchVectorDB } from "@/lib/rag";
-import { callLLM } from "@/lib/llm";
+import { searchVectorDB } from "agent-core/rag";
+import { callLLM } from "agent-core/llm";
 
 export async function POST(req: NextRequest) {
   const { model, query } = await req.json();

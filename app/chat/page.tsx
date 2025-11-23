@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Message } from "../../lib/agent/types";
+import { Message } from "agent-core/agent/types";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([{ role: "system", content: "You are a helpful assistant.", id: crypto.randomUUID() }]);

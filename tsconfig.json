@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "agent-core": ["./agent-core/index.ts"],
+      "agent-core/*": ["./agent-core/*"]
     }
   },
   "include": [

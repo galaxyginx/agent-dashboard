@@ -1,6 +1,6 @@
 // app/api/llm/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { callLLM } from "@/lib/llm";
+import { callLLM } from "agent-core/llm";
 
 export async function POST(req: NextRequest) {
   const { model, messages } = await req.json();

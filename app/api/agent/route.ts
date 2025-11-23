@@ -1,7 +1,7 @@
 // app/api/agent/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import type { Message } from "../../../lib/agent/types"; // submodule 側の型パスに合わせて調整
-import { createAgent } from "../../../lib/agent";
+import type { Message } from "agent-core/agent/types"; // submodule 側の型パスに合わせて調整
+import { createAgent } from "agent-core";
 
 export async function POST(req: NextRequest) {
   try {
