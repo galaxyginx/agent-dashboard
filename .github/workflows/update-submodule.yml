@@ -1,0 +1,30 @@
+name: Update Submodule
+
+on:
+  repository_dispatch:
+    types: [update-submodule]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Submodule
+        run: |
+          git submodule update --remote lib
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          
+          if [[ -n $(git status -s) ]]; then
+            git add lib
+            git commit -m "chore: update lib submodule to latest commit"
+            git push
+          else
+            echo "No changes to commit"
+          fi
