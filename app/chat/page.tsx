@@ -1,68 +1,37 @@
-"use client";
+import { Metadata } from "next"
+import { baseUrl, appName } from "@/agent-core/types"
+import { PageProps } from "@/types"
+import { getTranslation } from "@/translation"
+import BaseLayout from "@/components/templates/BaseLayout"
+import ChatView from "@/components/organisms/ChatView"
+import { getMasterData } from "@/requests/ServerRequest"
+import { getRegionPath } from "@/translation/RegionPath"
+import { headers } from "next/headers"
+import { isMobileDevice } from "@/lib/utils"
 
-import { useState } from "react";
-import { Message } from "agent-core/agent/types";
-
-export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([{ role: "system", content: "You are a helpful assistant.", id: crypto.randomUUID() }]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [model, setModel] = useState("gpt");
-
-  async function send() {
-    if (loading) return;
-    if (!input.trim()) return;
-    setLoading(true);
-    const newMessages = [...messages, { role: "user", content: input.trim(), id: crypto.randomUUID() } as Message];
-    setMessages(newMessages);
-    setInput("");
-
-    try {
-      const res = await fetch("/api/agent", {
-        method: "POST",
-        body: JSON.stringify({ model, messages: newMessages })
-      })
-      const data = await res.json();
-      if (data?.result) {
-        setMessages(prev => [...prev, { role: "assistant", content: data.result.content, id: crypto.randomUUID() } as Message]);
-      } else {
-        setMessages(prev => [...prev, { role: "assistant", content: "Error: no response", id: crypto.randomUUID() } as Message]);
-      }
-    } catch (e) {
-      console.error(e);
-      setMessages(prev => [...prev, { role: "assistant", content: "Network error", id: crypto.randomUUID() } as Message]);
-    } finally {
-      setLoading(false);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { locale } = await params
+    const t = await getTranslation(locale)
+    return {
+        metadataBase: new URL(baseUrl!),
+        title: appName,
+        description: t.home.description,
+        openGraph: {
+            siteName: appName,
+            title: appName,
+            description: t.home.description,
+            url: `${getRegionPath(locale)}`,
+            images: '/images/open-graph.png',
+            type: 'website'
+        },
     }
-  }
+}
 
-  return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl mb-4">Agent Chat</h1>
-      <select
-        value={model}
-        onChange={e => setModel(e.target.value)}
-        className="mb-4 border p-2"
-      >
-        <option value="gpt">GPT</option>
-        <option value="claude">Claude</option>
-        <option value="llama">Local Llama</option>
-      </select>
-
-      <div className="border p-4 h-[400px] mb-4 overflow-y-scroll">
-        {messages.map((m, i) => (
-          <div key={m.id} className="mb-2">
-            <strong>{m.role}:</strong> {m.content}
-          </div>
-        ))}
-      </div>
-
-      <input
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        className="border p-2 w-full"
-        onKeyDown={e => e.key === "Enter" && send()}
-      />
-    </div>
-  );
+export default async function ChatPage({ params }: PageProps) {
+  const { locale } = await params
+  const [masterData, t, header] = await Promise.all([getMasterData(), getTranslation(locale), headers()])
+  const isMobile = isMobileDevice(header.get("user-agent"))
+  return <BaseLayout masterData={{ ...masterData, locale }} t={t} isMobile={isMobile}>
+    <ChatView masterData={{...masterData, locale}} t={t} isMobile={isMobile} />
+  </BaseLayout>
 }

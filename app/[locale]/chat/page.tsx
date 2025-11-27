@@ -2,10 +2,8 @@ import { Metadata } from "next"
 import { baseUrl, appName } from "@/agent-core/types"
 import { PageProps } from "@/types"
 import { getTranslation } from "@/translation"
-import BaseLayout from "@/components/templates/BaseLayout"
-import ChatView from "@/components/organisms/ChatView"
-import { getMasterData } from "@/requests/ServerRequest"
 import { getRegionPath } from "@/translation/RegionPath"
+import ChatPage from "@/app/chat/page"
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { locale } = await params
@@ -25,10 +23,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
 }
 
-export default async function HomePage({ params }: PageProps) {
-  const { locale } = await params
-  const [masterData, t] = await Promise.all([getMasterData(), getTranslation(locale)])
-  return <BaseLayout masterData={{ ...masterData, locale }} t={t}>
-    <ChatView masterData={{...masterData, locale}} t={t} />
-  </BaseLayout>
+export default async function ChatPageGlobal({ params }: PageProps) {
+  return <ChatPage params={params} />
 }
